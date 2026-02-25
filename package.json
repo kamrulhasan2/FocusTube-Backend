@@ -1,0 +1,54 @@
+{
+  "name": "focustube-backend",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "author": "Kamrul Hasan",
+  "description": "FocusTube (Backend) is the server-side repository for the FocusTube web app — a distraction-free learning platform built on top of YouTube. This backend handles video processing, AI-powered summaries, and RAG-based chatbot features that turn passive watching into active learning.",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon",
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
+    "prettier:fix": "prettier --write \"./src/**/*.+(js|ts|json)\"",
+    "postinstall": "simple-git-hooks"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.3.1",
+    "express": "^5.1.0",
+    "express-error-toolkit": "^1.2.1",
+    "http-status-toolkit": "^2.0.0",
+    "mongoose": "^9.2.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.2.1",
+    "@types/nodemon": "^1.19.6",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.3.0",
+    "lint-staged": "^16.2.7",
+    "nodemon": "^3.1.14",
+    "simple-git-hooks": "^2.13.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm exec lint-staged -- --concurrent false"
+  },
+  "lint-staged": {
+    "*": [
+      "prettier --write --cache --ignore-unknown"
+    ]
+  }
+}

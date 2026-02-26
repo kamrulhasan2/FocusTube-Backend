@@ -1,16 +1,21 @@
-import env from 'dotenv';
-env.config();
 import app from './app';
+import { configEnv } from './config';
+import { connectDB } from './db';
+import { logger } from './utils';
 
-const port: number = Number(process.env.PORT) || 4001;
+const port: number = configEnv.port;
 
 (async () => {
   try {
+    // Connect to the database
+    await connectDB();
+
+    // Start the server
     app.listen(port, () => {
-      console.log(`Server listening on port http://localhost:${port}`);
+      logger.info(`Server listening on port http://localhost:${port}`);
     });
   } catch (err) {
-    console.error('Failed to connect DB or start server:', err);
+    logger.error('Failed to connect DB or start server:', err);
     process.exit(1);
   }
 })();

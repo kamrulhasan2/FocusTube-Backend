@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Sample API
+  description: This is a sample API server.
+  contact:
+      name: Kamrul Hasan
+      url: https://protfolio-eosin-rho.vercel.app/
+      email: kamrulhasan20656@gmail.com
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+paths:
+  /:
+    get:
+      summary: Entry Route
+      responses:
+        '200':
+          description: server is running successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Server is running
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: API is healthy

@@ -1,8 +1,7 @@
-import env from 'dotenv';
-env.config();
 import app from './app';
+import { configEnv } from './config';
 
-const port: number = Number(process.env.PORT) || 4001;
+const port: number = configEnv.port;
 
 (async () => {
   try {

@@ -3,6 +3,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import * as OpenApiValidator from 'express-openapi-validator';
 import { configEnv } from './env.config';
+import { logger } from '../utils';
 
 
 
@@ -23,10 +24,10 @@ export const swaggerDocSetup =  (app: any) => {
             }),
         );
 
-        console.log(`Swagger doc is connect on: http://localhost:${configEnv.port}/api-docs`);
-        
+        logger.info(`Swagger doc is connect on: http://localhost:${configEnv.port}/api-docs`);
+
     } catch (error) {
-        console.error('Swagger Doc connection Error: ', error)
+        logger.error('Swagger Doc connection Error: ', error)
         throw error;
     }
 }

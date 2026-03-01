@@ -24,7 +24,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 // health route
-app.get('/health', (_req: Request, res: Response) => {
+app.get('/api/v1/health', (_req: Request, res: Response) => {
   res.status(StatusCodes.OK).json({
     success: true,
     message: 'API is healthy',

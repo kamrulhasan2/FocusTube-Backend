@@ -1,47 +1,567 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   version: 1.0.0
-  title: Sample API
-  description: This is a sample API server.
+  title: FocusTube Backend API Documentation
+  description: >
+    Comprehensive enterprise-grade API documentation for FocusTube. 
+    This system supports smart YouTube caching, AI-powered learning features (RAG, Summarization), progress tracking, and subscription management.
   contact:
-      name: Kamrul Hasan
+      name: Md.Kamrul Hasan
       url: https://protfolio-eosin-rho.vercel.app/
       email: kamrulhasan20656@gmail.com
+
 servers:
-  - url: http://localhost:4000
-    description: Local development server
+  - url: http://localhost:4000/api/v1
+    description: Local Development Server
+  - url: https://localhost:4002/api/v1
+    description: Production Server (demo)
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # --- Reusable Error Schemas ---
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string, example: "The requested resource could not be found." }
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string, example: "email" }
+              message: { type: string, example: "Invalid email format" }
+
+    # --- Domain Schemas ---
+    User:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        avatar: { type: string }
+        plan: { type: string, enum: [FREE, PRO] }
+        createdAt: { type: string, format: date-time }
+
+    Playlist:
+      type: object
+      properties:
+        id: { type: string }
+        youtubePlaylistId: { type: string }
+        title: { type: string }
+        thumbnailUrl: { type: string }
+        totalVideos: { type: integer }
+
+    VideoMetadata:
+      type: object
+      properties:
+        id: { type: string }
+        youtubeVideoId: { type: string }
+        title: { type: string }
+        durationSeconds: { type: integer }
+        isAiProcessed: { type: boolean }
+
+    Note:
+      type: object
+      properties:
+        id: { type: string }
+        videoId: { type: string }
+        content: { type: string }
+        timestampSeconds: { type: integer }
+        createdAt: { type: string, format: date-time }
+
 paths:
-  /:
-    get:
-      summary: Entry Route
-      responses:
-        '200':
-          description: server is running successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Server is running
+  # ==========================================
+  # 0. SYSTEM MODULE
+  # ==========================================
   /health:
-    get:
-      summary: Health check endpoint
+      get:
+        tags: [System]
+        summary: Health check endpoint
+        responses:
+          '200':
+            description: API is healthy
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success:
+                      type: boolean
+                      example: true
+                    message:
+                      type: string
+                      example: API is healthy
+  # ==========================================
+  # 1. AUTH MODULE
+  # ==========================================
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name: { type: string, minLength: 2 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
       responses:
-        '200':
-          description: API is healthy
+        201:
+          description: User registered successfully
+        400:
+          description: Validation Error (Zod)
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        409:
+          description: Conflict - Email already exists
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login and get access/refresh tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string }
+      responses:
+        200:
+          description: Successful login
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: API is healthy
+                  success: { type: boolean, example: true }
+                  data:
+                    type: object
+                    properties:
+                      accessToken: { type: string }
+                      refreshToken: { type: string }
+        401:
+          description: Unauthorized - Invalid credentials
+          
+  /auth/refresh-token:
+    post:
+      tags: [Auth]
+      summary: Generate a new access token using a refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken: { type: string }
+      responses:
+        200:
+          description: New access token generated
+        401:
+          description: Invalid or expired refresh token
+          
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout user and invalidate tokens
+      security: [{ bearerAuth: [] }]
+      responses:
+        200:
+          description: Successfully logged out
+        401:
+          description: Unauthorized
+
+  # ==========================================
+  # 2. USER MODULE
+  # ==========================================
+  /users/me:
+    get:
+      tags: [User]
+      summary: Get current logged-in user profile
+      security: [{ bearerAuth: [] }]
+      responses:
+        200:
+          description: User profile details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  data: { $ref: '#/components/schemas/User' }
+        401:
+          description: Unauthorized
+          
+    patch:
+      tags: [User]
+      summary: Update user profile
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                avatar: { type: string }
+      responses:
+        200:
+          description: Profile updated successfully
+        400:
+          description: Validation Error
+
+  # ==========================================
+  # 3. PLAYLIST MODULE
+  # ==========================================
+  /playlists/import:
+    post:
+      tags: [Playlist]
+      summary: Import YouTube playlist (triggers smart caching)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [playlistUrl]
+              properties:
+                playlistUrl: { type: string }
+      responses:
+        201:
+          description: Playlist imported and cached successfully
+        400:
+          description: Invalid YouTube URL
+        403:
+          description: Quota Exceeded (Free tier limits)
+        404:
+          description: Playlist not found or is private
+
+  /playlists:
+    get:
+      tags: [Playlist]
+      summary: Get all saved playlists for the user
+      security: [{ bearerAuth: [] }]
+      responses:
+        200:
+          description: List of playlists
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Playlist' }
+
+  /playlists/{id}:
+    get:
+      tags: [Playlist]
+      summary: Get detailed view of a specific playlist
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Playlist details with video list
+        404:
+          description: Playlist not found
+
+  /playlists/{id}/sync:
+    post:
+      tags: [Playlist]
+      summary: Manually sync playlist data from YouTube
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Playlist synced successfully
+        429:
+          description: Too Many Requests (Rate limit applied to manual syncs)
+
+  # ==========================================
+  # 4. VIDEO & AI MODULE
+  # ==========================================
+  /videos/{id}:
+    get:
+      tags: [Video & AI]
+      summary: Get specific video metadata
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Video metadata retrieved
+          content:
+            application/json:
+              schema:
+                properties:
+                  data: { $ref: '#/components/schemas/VideoMetadata' }
+        404:
+          description: Video not found
+
+  /videos/{id}/transcript:
+    get:
+      tags: [Video & AI]
+      summary: Fetch the full transcript of a video
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Transcript retrieved successfully
+        404:
+          description: Transcript not available for this video
+
+  /videos/{id}/summary:
+    post:
+      tags: [Video & AI]
+      summary: Generate AI summary for the video
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: AI Summary generated
+        403:
+          description: Forbidden - Requires PRO plan
+        429:
+          description: Too Many Requests - AI generation quota exceeded
+
+  /videos/{id}/chat:
+    post:
+      tags: [Video & AI]
+      summary: Ask questions about the video content (RAG chatbot)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question]
+              properties:
+                question: { type: string }
+      responses:
+        200:
+          description: AI response provided
+        400:
+          description: Invalid question format
+        403:
+          description: Forbidden - Requires PRO plan
+
+  # ==========================================
+  # 5. LIBRARY MODULE
+  # ==========================================
+  /library:
+    get:
+      tags: [Library]
+      summary: Get list of ongoing videos in the user's library
+      security: [{ bearerAuth: [] }]
+      responses:
+        200:
+          description: Ongoing videos returned successfully
+
+  /library/progress:
+    patch:
+      tags: [Library]
+      summary: Update video watching progress
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [videoId, watchedSeconds, completionPercentage]
+              properties:
+                videoId: { type: string }
+                watchedSeconds: { type: integer }
+                completionPercentage: { type: number, minimum: 0, maximum: 100 }
+      responses:
+        200:
+          description: Progress updated
+        400:
+          description: Invalid progress data
+
+  # ==========================================
+  # 6. NOTE MODULE
+  # ==========================================
+  /notes:
+    post:
+      tags: [Notes]
+      summary: Create a new timestamped note
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [videoId, content, timestampSeconds]
+              properties:
+                videoId: { type: string }
+                content: { type: string }
+                timestampSeconds: { type: integer }
+      responses:
+        201:
+          description: Note created successfully
+        400:
+          description: Validation Error
+
+  /notes/video/{videoId}:
+    get:
+      tags: [Notes]
+      summary: Get all notes for a specific video
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: videoId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: List of notes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Note' }
+
+  /notes/{id}:
+    patch:
+      tags: [Notes]
+      summary: Edit an existing note
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string }
+      responses:
+        200:
+          description: Note updated
+        403:
+          description: Forbidden - User does not own this note
+        404:
+          description: Note not found
+
+    delete:
+      tags: [Notes]
+      summary: Delete a note
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        200:
+          description: Note deleted successfully
+        403:
+          description: Forbidden - User does not own this note
+        404:
+          description: Note not found
+
+  # ==========================================
+  # 7. BILLING & SUBSCRIPTION MODULE
+  # ==========================================
+  /billing/plans:
+    get:
+      tags: [Billing]
+      summary: View available subscription plans (Monthly, Yearly)
+      responses:
+        200:
+          description: Plans retrieved successfully
+
+  /billing/checkout:
+    post:
+      tags: [Billing]
+      summary: Initialize a checkout session (Stripe/SSLCommerz)
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [planId]
+              properties:
+                planId: { type: string }
+      responses:
+        200:
+          description: Checkout URL generated
+        400:
+          description: Invalid Plan ID
+        503:
+          description: Payment Gateway Unavailable
+
+  /billing/webhook:
+    post:
+      tags: [Billing]
+      summary: Receive status updates from the payment gateway
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Payment Gateway Payload
+      responses:
+        200:
+          description: Webhook received and processed
+        400:
+          description: Invalid Webhook Signature
+
+  /billing/history:
+    get:
+      tags: [Billing]
+      summary: View user's past transaction history
+      security: [{ bearerAuth: [] }]
+      responses:
+        200:
+          description: Transaction history retrieved
+        401:
+          description: Unauthorized

@@ -1,7 +1,7 @@
 import app from './app';
 import { configEnv } from './config';
 import { connectDB } from './db';
-import { logger } from './utils';
+import { logger } from './shared/utils';
 
 const port: number = configEnv.port;
 

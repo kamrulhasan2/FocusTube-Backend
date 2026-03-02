@@ -1,7 +1,7 @@
 import winston from 'winston';
 import 'winston-daily-rotate-file';
 import * as rTracer from 'cls-rtracer';
-import { configEnv } from '../config';
+import { configEnv } from '../../config';
 
 const { combine, timestamp, json, colorize, printf, errors } = winston.format;
 

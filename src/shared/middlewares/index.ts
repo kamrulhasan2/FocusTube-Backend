@@ -1,6 +1,6 @@
 import cors from 'cors';
 import morgan from 'morgan';
-import { logger } from '../utils';
+import { logger } from '../utils'
 import * as rTracer from 'cls-rtracer';
 import favicon from 'serve-favicon';
 import path from 'path';

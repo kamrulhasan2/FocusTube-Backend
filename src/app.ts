@@ -2,8 +2,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import { notFoundHandler, globalErrorHandler } from 'express-error-toolkit';
 import { StatusCodes } from 'http-status-toolkit';
 import { swaggerDocSetup } from './config';
-import { applyMiddleware } from './middleware';
-import { logger } from './utils';
+import { applyMiddleware } from './shared/middlewares';
+import { logger } from './shared/utils';
 
 
 const app = express();

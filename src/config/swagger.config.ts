@@ -3,7 +3,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import * as OpenApiValidator from 'express-openapi-validator';
 import { configEnv } from './env.config';
-import { logger } from '../utils';
+import { logger } from '../shared/utils';
 
 
 

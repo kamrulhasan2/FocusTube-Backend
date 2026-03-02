@@ -24,19 +24,22 @@
     "express-error-toolkit": "^1.2.1",
     "express-openapi-validator": "^5.6.2",
     "http-status-toolkit": "^2.0.0",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.2",
     "morgan": "^1.10.1",
     "serve-favicon": "^2.5.1",
     "swagger-ui-express": "^5.0.1",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.2.1",
     "@types/nodemon": "^1.19.6",

@@ -1,11 +1,11 @@
 import cors from 'cors';
 import morgan from 'morgan';
-import { logger } from '../utils';
+import { logger } from '../utils'
 import * as rTracer from 'cls-rtracer';
 import favicon from 'serve-favicon';
 import path from 'path';
 
-export const applyMiddleware = (app: any) => {
+const applyMiddleware = (app: any) => {
     app.use(cors());
 
     // Serve favicon
@@ -21,3 +21,5 @@ export const applyMiddleware = (app: any) => {
         }
     }));
 }
+
+export default applyMiddleware;

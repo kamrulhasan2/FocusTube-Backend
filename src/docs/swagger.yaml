@@ -224,6 +224,23 @@ paths:
           description: Profile updated successfully
         400:
           description: Validation Error
+    delete:
+      tags: [User]
+      summary: delete user profile
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password: { type: string }
+      responses:
+        200:
+          description: profile delete successfully
+        400:
+          description: Validation Error
 
   # ==========================================
   # 3. PLAYLIST MODULE

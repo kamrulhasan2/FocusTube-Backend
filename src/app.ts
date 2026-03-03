@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { notFoundHandler, globalErrorHandler } from 'express-error-toolkit';
 import { StatusCodes } from 'http-status-toolkit';
 import { swaggerDocSetup } from './config';
-import { applyMiddleware } from './shared/middlewares';
+import { applyMiddleware, globalErrorHandler, notFoundHandler } from './shared/middlewares';
 import { logger } from './shared/utils';
+import routes from './routes';
 
 
 const app = express();
@@ -30,6 +30,9 @@ app.get('/api/v1/health', (_req: Request, res: Response) => {
     message: 'API is healthy',
   });
 });
+
+// module routes
+app.use('/api/v1', routes);
 
 // Connect Swagger Doc for API documentation
 swaggerDocSetup(app);

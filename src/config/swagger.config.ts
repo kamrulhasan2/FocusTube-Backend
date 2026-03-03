@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import * as OpenApiValidator from 'express-openapi-validator';
@@ -9,8 +10,9 @@ import { logger } from '../shared/utils';
 
 export const swaggerDocSetup =  (app: any) => {
     try {
-
-        const apiSpec = path.join(__dirname, '../docs/swagger.yaml');
+        const distSpec = path.join(__dirname, '../docs/swagger.yaml');
+        const srcSpec = path.join(process.cwd(), 'src', 'docs', 'swagger.yaml');
+        const apiSpec = fs.existsSync(distSpec) ? distSpec : srcSpec;
         const swaggerDocument = YAML.load(apiSpec);
 
         // Serve Swagger UI at the /api-docs endpoint

@@ -20,10 +20,10 @@
     "sourceMap": true,
     "inlineSources": true,
     "baseUrl": "./src",
+    "types": ["node", "vitest/globals"],
     "paths": {
       "@/*": ["*"]
-    },
-    "typeRoots": ["./node_modules/@types", "./src/shared/types"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

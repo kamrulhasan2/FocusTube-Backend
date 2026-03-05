@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { validateRequest, authGuard } from '../../../shared/middlewares';
+import { upload } from '../../../shared/utils/fileUpload.util';
 import { AuthController } from '../controller';
 import { AuthValidation } from '../validation/auth.validation';
 
@@ -7,6 +8,7 @@ const router = Router();
 
 router.post(
   '/register',
+  upload('avatars').single('avatar'),
   validateRequest(AuthValidation.register),
   AuthController.register,
 );

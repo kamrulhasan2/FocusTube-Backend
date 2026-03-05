@@ -1,11 +1,10 @@
 import bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-toolkit';
 import AppError from '../../../shared/errors/AppError';
 import { configEnv } from '../../../config';
+import { deleteFileFromB2 } from '../../../shared/utils/fileUpload.util';
 import { User } from '../model';
-import {
-  IChangePasswordPayload,
-  IUserUpdatePayload,
-} from '../interface/user.interface';
+import { IChangePasswordPayload, IUserUpdatePayload } from '../interface/user.interface';
 
 const sanitizeUser = (user: {
   _id: { toString: () => string };
@@ -37,17 +36,19 @@ const getMe = async (userId: string) => {
 };
 
 const updateProfile = async (userId: string, payload: IUserUpdatePayload) => {
-  const updatedUser = await User.findOneAndUpdate(
-    { _id: userId, isDeleted: false },
-    { $set: payload },
-    { new: true },
-  );
-
-  if (!updatedUser) {
-    throw new AppError(404, 'User not found.');
+  const user = await User.findOne({ _id: userId, isDeleted: false });
+  if (!user) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'User not found.');
   }
 
-  return sanitizeUser(updatedUser);
+  if (payload.avatar && user.avatar && payload.avatar !== user.avatar) {
+    await deleteFileFromB2(user.avatar);
+  }
+
+  Object.assign(user, payload);
+  await user.save();
+
+  return sanitizeUser(user);
 };
 
 const changePassword = async (userId: string, payload: IChangePasswordPayload) => {
@@ -56,10 +57,7 @@ const changePassword = async (userId: string, payload: IChangePasswordPayload) =
     throw new AppError(404, 'User not found.');
   }
 
-  const isCurrentPasswordMatched = await bcrypt.compare(
-    payload.currentPassword,
-    user.password,
-  );
+  const isCurrentPasswordMatched = await bcrypt.compare(payload.currentPassword, user.password);
   if (!isCurrentPasswordMatched) {
     throw new AppError(400, 'Current password is incorrect.');
   }
@@ -69,10 +67,7 @@ const changePassword = async (userId: string, payload: IChangePasswordPayload) =
     throw new AppError(400, 'New password must be different from current password.');
   }
 
-  const hashedPassword = await bcrypt.hash(
-    payload.newPassword,
-    configEnv.bcrypt_salt_rounds,
-  );
+  const hashedPassword = await bcrypt.hash(payload.newPassword, configEnv.bcrypt_salt_rounds);
 
   await User.updateOne(
     { _id: userId },

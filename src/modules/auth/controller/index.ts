@@ -3,13 +3,24 @@ import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { catchAsync, sendResponse } from '../../../shared/utils';
 import { AuthServices } from '../services';
+import { IRegisterPayload } from '../interface/auth.interface';
 
 type AuthenticatedRequest = Request & {
   user: JwtPayload & { userId?: string };
 };
 
+type MulterS3File = Express.Multer.File & {
+  location?: string;
+};
+
 const register = catchAsync(async (req: Request, res: Response) => {
-  const result = await AuthServices.register(req.body);
+  const uploadedAvatar = (req.file as MulterS3File | undefined)?.location;
+  const payload: IRegisterPayload = {
+    ...req.body,
+    avatar: uploadedAvatar || req.body.avatar,
+  };
+
+  const result = await AuthServices.register(payload);
 
   sendResponse(res, {
     statusCode: StatusCodes.CREATED,

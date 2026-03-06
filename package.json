@@ -19,6 +19,9 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1002.0",
+    "@types/multer": "^2.0.0",
+    "@types/multer-s3": "^3.0.3",
     "bcrypt": "^6.0.0",
     "cls-rtracer": "^2.6.3",
     "cors": "^2.8.5",
@@ -30,6 +33,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.2",
     "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "multer-s3": "^3.0.1",
     "serve-favicon": "^2.5.1",
     "swagger-ui-express": "^5.0.1",
     "winston": "^3.19.0",
@@ -46,9 +51,9 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.2.1",
-    "@types/supertest": "^6.0.3",
     "@types/nodemon": "^1.19.6",
     "@types/serve-favicon": "^2.5.7",
+    "@types/supertest": "^6.0.3",
     "@types/swagger-ui-express": "^4.1.8",
     "@types/winston": "^2.4.4",
     "@types/yamljs": "^0.2.34",
@@ -57,15 +62,15 @@
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.3.0",
     "lint-staged": "^16.2.7",
-    "nodemon": "^3.1.14",
     "mongodb-memory-server": "^10.2.3",
+    "nodemon": "^3.1.14",
     "simple-git-hooks": "^2.13.1",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4",
-    "typescript-eslint": "^8.41.0"
+    "typescript-eslint": "^8.41.0",
+    "vitest": "^3.2.4"
   },
   "simple-git-hooks": {
     "pre-commit": "npm exec lint-staged -- --concurrent false"

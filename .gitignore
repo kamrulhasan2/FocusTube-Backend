@@ -19,7 +19,8 @@ dist-ssr
 
 # Local files
 *.local
-
+ai-contex
+tmp
 # Optional cache
 .cache
 

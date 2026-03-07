@@ -6,9 +6,9 @@ info:
     Comprehensive enterprise-grade API documentation for FocusTube. 
     This system supports smart YouTube caching, AI-powered learning features (RAG, Summarization), progress tracking, and subscription management.
   contact:
-      name: Md.Kamrul Hasan
-      url: https://protfolio-eosin-rho.vercel.app/
-      email: kamrulhasan20656@gmail.com
+    name: Md.Kamrul Hasan
+    url: https://protfolio-eosin-rho.vercel.app/
+    email: kamrulhasan20656@gmail.com
 
 servers:
   - url: http://localhost:4000/api/v1
@@ -29,14 +29,14 @@ components:
       type: object
       properties:
         success: { type: boolean, example: false }
-        message: { type: string, example: "The requested resource could not be found." }
+        message: { type: string, example: 'The requested resource could not be found.' }
         errors:
           type: array
           items:
             type: object
             properties:
-              field: { type: string, example: "email" }
-              message: { type: string, example: "Invalid email format" }
+              field: { type: string, example: 'email' }
+              message: { type: string, example: 'Invalid email format' }
 
     # --- Domain Schemas ---
     User:
@@ -66,33 +66,33 @@ components:
     PlaylistThumbnailSet:
       type: object
       properties:
-        default: { type: string, example: "https://i.ytimg.com/vi/abc/default.jpg" }
-        medium: { type: string, example: "https://i.ytimg.com/vi/abc/mqdefault.jpg" }
-        high: { type: string, example: "https://i.ytimg.com/vi/abc/hqdefault.jpg" }
-        standard: { type: string, example: "https://i.ytimg.com/vi/abc/sddefault.jpg" }
-        maxres: { type: string, example: "https://i.ytimg.com/vi/abc/maxresdefault.jpg" }
+        default: { type: string, example: 'https://i.ytimg.com/vi/abc/default.jpg' }
+        medium: { type: string, example: 'https://i.ytimg.com/vi/abc/mqdefault.jpg' }
+        high: { type: string, example: 'https://i.ytimg.com/vi/abc/hqdefault.jpg' }
+        standard: { type: string, example: 'https://i.ytimg.com/vi/abc/sddefault.jpg' }
+        maxres: { type: string, example: 'https://i.ytimg.com/vi/abc/maxresdefault.jpg' }
 
     PlaylistVideo:
       type: object
       properties:
-        youtubeVideoId: { type: string, example: "dQw4w9WgXcQ" }
-        title: { type: string, example: "Lesson 01: TypeScript Basics" }
+        youtubeVideoId: { type: string, example: 'dQw4w9WgXcQ' }
+        title: { type: string, example: 'Lesson 01: TypeScript Basics' }
         description: { type: string }
-        channelId: { type: string, example: "UC_x5XG1OV2P6uZZ5FSM9Ttw" }
-        channelTitle: { type: string, example: "FocusTube Academy" }
+        channelId: { type: string, example: 'UC_x5XG1OV2P6uZZ5FSM9Ttw' }
+        channelTitle: { type: string, example: 'FocusTube Academy' }
         thumbnails: { $ref: '#/components/schemas/PlaylistThumbnailSet' }
-        duration: { type: string, example: "PT12M8S" }
+        duration: { type: string, example: 'PT12M8S' }
         durationSeconds: { type: integer, example: 728 }
 
     Playlist:
       type: object
       properties:
-        _id: { type: string, example: "65f1b4f17ddf2ef7d3354d19" }
-        youtubePlaylistId: { type: string, example: "PLxxxxxx" }
-        title: { type: string, example: "Complete Backend Engineering" }
+        _id: { type: string, example: '65f1b4f17ddf2ef7d3354d19' }
+        youtubePlaylistId: { type: string, example: 'PLxxxxxx' }
+        title: { type: string, example: 'Complete Backend Engineering' }
         description: { type: string }
-        channelId: { type: string, example: "UCxxxxxx" }
-        channelTitle: { type: string, example: "FocusTube Academy" }
+        channelId: { type: string, example: 'UCxxxxxx' }
+        channelTitle: { type: string, example: 'FocusTube Academy' }
         thumbnails: { $ref: '#/components/schemas/PlaylistThumbnailSet' }
         sourceType: { type: string, enum: [YOUTUBE], example: YOUTUBE }
         videos:
@@ -109,25 +109,87 @@ components:
     PlaylistListItem:
       type: object
       properties:
-        id: { type: string, example: "65f1b4f17ddf2ef7d3354d19" }
-        youtubePlaylistId: { type: string, example: "PLxxxxxx" }
-        title: { type: string, example: "Complete Backend Engineering" }
+        id: { type: string, example: '65f1b4f17ddf2ef7d3354d19' }
+        youtubePlaylistId: { type: string, example: 'PLxxxxxx' }
+        title: { type: string, example: 'Complete Backend Engineering' }
         description: { type: string }
-        channelTitle: { type: string, example: "FocusTube Academy" }
+        channelTitle: { type: string, example: 'FocusTube Academy' }
         thumbnails: { $ref: '#/components/schemas/PlaylistThumbnailSet' }
         totalVideos: { type: integer, example: 42 }
         fetchedAt: { type: string, format: date-time }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
+    VideoThumbnailSet:
+      type: object
+      properties:
+        default: { type: string, example: 'https://i.ytimg.com/vi/abc/default.jpg' }
+        medium: { type: string, example: 'https://i.ytimg.com/vi/abc/mqdefault.jpg' }
+        high: { type: string, example: 'https://i.ytimg.com/vi/abc/hqdefault.jpg' }
+        standard: { type: string, example: 'https://i.ytimg.com/vi/abc/sddefault.jpg' }
+        maxres: { type: string, example: 'https://i.ytimg.com/vi/abc/maxresdefault.jpg' }
+
+    TranscriptChunk:
+      type: object
+      properties:
+        text: { type: string, example: 'In this lesson we start with TypeScript fundamentals.' }
+        startTime: { type: number, format: float, example: 12.42 }
+        duration: { type: number, format: float, example: 4.13 }
+
     VideoMetadata:
       type: object
       properties:
-        id: { type: string }
-        youtubeVideoId: { type: string }
-        title: { type: string }
-        durationSeconds: { type: integer }
-        isAiProcessed: { type: boolean }
+        _id: { type: string, example: '67c99f5f8f9bbce6f1e7dd01' }
+        youtubeVideoId: { type: string, example: 'dQw4w9WgXcQ' }
+        playlistId: { type: string, nullable: true, example: '67c99f5f8f9bbce6f1e7ddaa' }
+        title: { type: string, example: 'Lesson 01: TypeScript Basics' }
+        description: { type: string, example: 'Introduction to TypeScript.' }
+        duration: { type: string, example: 'PT12M8S' }
+        thumbnails: { $ref: '#/components/schemas/VideoThumbnailSet' }
+        transcript:
+          type: array
+          items: { $ref: '#/components/schemas/TranscriptChunk' }
+        aiSummary: { type: string, example: 'Key Takeaways...' }
+        transcriptFetchedAt: { type: string, format: date-time }
+        summaryGeneratedAt: { type: string, format: date-time }
+        ragChunksGeneratedAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    VideoTranscriptData:
+      type: object
+      properties:
+        cacheHit: { type: boolean, example: true }
+        transcript:
+          type: array
+          items: { $ref: '#/components/schemas/TranscriptChunk' }
+
+    VideoSummaryData:
+      type: object
+      properties:
+        cacheHit: { type: boolean, example: false }
+        summary: { type: string, example: '1) Key Takeaways...' }
+
+    VideoChatRequest:
+      type: object
+      required: [question]
+      properties:
+        question:
+          type: string
+          minLength: 3
+          maxLength: 1000
+          example: 'What are the main points about TypeScript generics?'
+
+    VideoChatData:
+      type: object
+      properties:
+        answer:
+          type: string
+          example: 'The transcript explains generics as reusable type-safe templates...'
+        referencedTimestamps:
+          type: array
+          items: { type: number, format: float }
+          example: [120.4, 225.9]
 
     Note:
       type: object
@@ -143,23 +205,23 @@ paths:
   # 0. SYSTEM MODULE
   # ==========================================
   /health:
-      get:
-        tags: [System]
-        summary: Health check endpoint
-        responses:
-          '200':
-            description: API is healthy
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    success:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: API is healthy
+    get:
+      tags: [System]
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: API is healthy
   # ==========================================
   # 1. AUTH MODULE
   # ==========================================
@@ -177,7 +239,7 @@ paths:
               properties:
                 name: { type: string, minLength: 2 }
                 email: { type: string, format: email }
-                password: { type: string, minLength: 8, example: "StrongPass123" }
+                password: { type: string, minLength: 8, example: 'StrongPass123' }
       responses:
         201:
           description: User registered successfully
@@ -187,7 +249,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "User registered successfully." }
+                  message: { type: string, example: 'User registered successfully.' }
                   data: { $ref: '#/components/schemas/AuthPayload' }
         400:
           description: Validation Error (Zod)
@@ -218,11 +280,11 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Login successful." }
+                  message: { type: string, example: 'Login successful.' }
                   data: { $ref: '#/components/schemas/AuthPayload' }
         401:
           description: Unauthorized - Invalid credentials
-          
+
   /auth/refresh-token:
     post:
       tags: [Auth]
@@ -245,11 +307,11 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Token refreshed successfully." }
+                  message: { type: string, example: 'Token refreshed successfully.' }
                   data: { $ref: '#/components/schemas/AuthTokens' }
         401:
           description: Invalid or expired refresh token
-          
+
   /auth/logout:
     post:
       tags: [Auth]
@@ -264,7 +326,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Logout successful." }
+                  message: { type: string, example: 'Logout successful.' }
                   data:
                     type: object
                     example: {}
@@ -288,11 +350,11 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Profile fetched successfully." }
+                  message: { type: string, example: 'Profile fetched successfully.' }
                   data: { $ref: '#/components/schemas/User' }
         401:
           description: Unauthorized
-          
+
     patch:
       tags: [User]
       summary: Update user profile
@@ -315,7 +377,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Profile updated successfully." }
+                  message: { type: string, example: 'Profile updated successfully.' }
                   data: { $ref: '#/components/schemas/User' }
         400:
           description: Validation Error
@@ -336,7 +398,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Account deactivated successfully." }
+                  message: { type: string, example: 'Account deactivated successfully.' }
                   data:
                     type: object
                     example: {}
@@ -359,7 +421,7 @@ paths:
               required: [currentPassword, newPassword]
               properties:
                 currentPassword: { type: string, minLength: 8 }
-                newPassword: { type: string, minLength: 8, example: "NewStrongPass123" }
+                newPassword: { type: string, minLength: 8, example: 'NewStrongPass123' }
       responses:
         200:
           description: Password changed successfully
@@ -369,7 +431,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Password changed successfully." }
+                  message: { type: string, example: 'Password changed successfully.' }
                   data:
                     type: object
                     example: {}
@@ -398,7 +460,7 @@ paths:
               properties:
                 url:
                   type: string
-                  example: "https://www.youtube.com/playlist?list=PLxxxxxxxxxxxxxxxx"
+                  example: 'https://www.youtube.com/playlist?list=PLxxxxxxxxxxxxxxxx'
       responses:
         201:
           description: Playlist imported from cache or YouTube and saved for the user
@@ -408,7 +470,11 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Playlist fetched from YouTube and cached successfully." }
+                  message:
+                    {
+                      type: string,
+                      example: 'Playlist fetched from YouTube and cached successfully.',
+                    }
                   data:
                     type: object
                     properties:
@@ -437,7 +503,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Playlists fetched successfully." }
+                  message: { type: string, example: 'Playlists fetched successfully.' }
                   data:
                     type: array
                     items: { $ref: '#/components/schemas/PlaylistListItem' }
@@ -465,7 +531,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Playlist details fetched successfully." }
+                  message: { type: string, example: 'Playlist details fetched successfully.' }
                   data: { $ref: '#/components/schemas/Playlist' }
         401:
           description: Unauthorized
@@ -493,7 +559,7 @@ paths:
                 type: object
                 properties:
                   success: { type: boolean, example: true }
-                  message: { type: string, example: "Playlist synced successfully." }
+                  message: { type: string, example: 'Playlist synced successfully.' }
                   data: { $ref: '#/components/schemas/Playlist' }
         401:
           description: Unauthorized
@@ -514,78 +580,144 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            pattern: "(^[a-f\\d]{24}$)|(^[a-zA-Z0-9_-]{6,}$)"
       responses:
         200:
           description: Video metadata retrieved
           content:
             application/json:
               schema:
+                type: object
                 properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Video metadata fetched successfully.' }
                   data: { $ref: '#/components/schemas/VideoMetadata' }
+        400:
+          description: Invalid video identifier
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
         404:
           description: Video not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /videos/{id}/transcript:
     get:
       tags: [Video & AI]
-      summary: Fetch the full transcript of a video
+      summary: Fetch transcript with MongoDB caching
       security: [{ bearerAuth: [] }]
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            pattern: "(^[a-f\\d]{24}$)|(^[a-zA-Z0-9_-]{6,}$)"
       responses:
         200:
           description: Transcript retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Transcript fetched from cache successfully.' }
+                  data: { $ref: '#/components/schemas/VideoTranscriptData' }
+        400:
+          description: Invalid video identifier
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
         404:
           description: Transcript not available for this video
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        502:
+          description: External transcript or AI service failure
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /videos/{id}/summary:
     post:
       tags: [Video & AI]
-      summary: Generate AI summary for the video
+      summary: Generate AI summary with summary caching
       security: [{ bearerAuth: [] }]
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            pattern: "(^[a-f\\d]{24}$)|(^[a-zA-Z0-9_-]{6,}$)"
       responses:
         200:
-          description: AI Summary generated
-        403:
-          description: Forbidden - Requires PRO plan
-        429:
-          description: Too Many Requests - AI generation quota exceeded
+          description: AI summary generated or served from cache
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'AI summary generated successfully.' }
+                  data: { $ref: '#/components/schemas/VideoSummaryData' }
+        400:
+          description: Invalid video identifier
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+        404:
+          description: Video or transcript not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        502:
+          description: AI provider error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        503:
+          description: AI service not configured
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /videos/{id}/chat:
     post:
       tags: [Video & AI]
-      summary: Ask questions about the video content (RAG chatbot)
+      summary: Ask transcript-grounded questions (RAG chatbot)
       security: [{ bearerAuth: [] }]
       parameters:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            pattern: "(^[a-f\\d]{24}$)|(^[a-zA-Z0-9_-]{6,}$)"
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [question]
-              properties:
-                question: { type: string }
+            schema: { $ref: '#/components/schemas/VideoChatRequest' }
       responses:
         200:
           description: AI response provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'AI answer generated successfully.' }
+                  data: { $ref: '#/components/schemas/VideoChatData' }
         400:
           description: Invalid question format
-        403:
-          description: Forbidden - Requires PRO plan
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+        404:
+          description: Video or transcript not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        502:
+          description: AI provider error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        503:
+          description: AI service not configured
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   # ==========================================
   # 5. LIBRARY MODULE

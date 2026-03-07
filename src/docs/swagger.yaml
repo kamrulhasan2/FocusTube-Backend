@@ -200,6 +200,99 @@ components:
         timestampSeconds: { type: integer }
         createdAt: { type: string, format: date-time }
 
+    LibraryEnrollmentStatus:
+      type: string
+      enum: [enrolled, completed, archived]
+      example: enrolled
+
+    LibraryEnrollment:
+      type: object
+      properties:
+        _id: { type: string, example: '67ca08f798a1e1726a932a11' }
+        user_id: { type: string, example: '67ca08f798a1e1726a932a10' }
+        playlist_id: { type: string, example: '67ca08f798a1e1726a932a12' }
+        status: { $ref: '#/components/schemas/LibraryEnrollmentStatus' }
+        enrolled_at: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    LibraryEnrolledPlaylist:
+      type: object
+      properties:
+        _id: { type: string, example: '67ca08f798a1e1726a932a12' }
+        youtubePlaylistId: { type: string, example: 'PLxxxxxx' }
+        title: { type: string, example: 'Complete Backend Engineering' }
+        description: { type: string }
+        channelTitle: { type: string, example: 'FocusTube Academy' }
+        thumbnails: { $ref: '#/components/schemas/PlaylistThumbnailSet' }
+        videos:
+          type: array
+          items: { $ref: '#/components/schemas/PlaylistVideo' }
+
+    LibraryEnrollRequest:
+      type: object
+      required: [playlist_id]
+      properties:
+        playlist_id:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+          example: '67ca08f798a1e1726a932a12'
+
+    LibraryProgressUpdateRequest:
+      type: object
+      required: [video_id, playlist_id, watched_second]
+      properties:
+        video_id:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+          example: '67ca08f798a1e1726a932a13'
+        playlist_id:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+          example: '67ca08f798a1e1726a932a12'
+        watched_second:
+          type: number
+          minimum: 0
+          example: 510
+
+    LibraryProgress:
+      type: object
+      properties:
+        _id: { type: string, example: '67ca08f798a1e1726a932a14' }
+        user_id: { type: string, example: '67ca08f798a1e1726a932a10' }
+        video_id: { type: string, example: '67ca08f798a1e1726a932a13' }
+        playlist_id: { type: string, example: '67ca08f798a1e1726a932a12' }
+        last_watched_second: { type: number, example: 510 }
+        is_completed: { type: boolean, example: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    LibraryPlaylistProgressItem:
+      type: object
+      properties:
+        enrollment_id: { type: string, example: '67ca08f798a1e1726a932a11' }
+        playlist_id: { type: string, example: '67ca08f798a1e1726a932a12' }
+        youtubePlaylistId: { type: string, example: 'PLxxxxxx' }
+        title: { type: string, example: 'Complete Backend Engineering' }
+        description: { type: string }
+        channelTitle: { type: string, example: 'FocusTube Academy' }
+        thumbnails: { $ref: '#/components/schemas/PlaylistThumbnailSet' }
+        enrollment_status: { $ref: '#/components/schemas/LibraryEnrollmentStatus' }
+        enrolled_at: { type: string, format: date-time }
+        total_videos: { type: integer, example: 20 }
+        completed_videos: { type: integer, example: 9 }
+        progress_percentage: { type: number, format: float, example: 45 }
+
+    LibraryContinueWatchingItem:
+      type: object
+      nullable: true
+      properties:
+        video_id: { type: string, example: '67ca08f798a1e1726a932a13' }
+        playlist_id: { type: string, example: '67ca08f798a1e1726a932a12' }
+        last_watched_second: { type: number, example: 510 }
+        video_title: { type: string, example: 'Lesson 07: Dependency Injection' }
+        thumbnail: { type: string, example: 'https://i.ytimg.com/vi/abc/mqdefault.jpg' }
+
 paths:
   # ==========================================
   # 0. SYSTEM MODULE
@@ -722,14 +815,74 @@ paths:
   # ==========================================
   # 5. LIBRARY MODULE
   # ==========================================
-  /library:
+  /library/enroll:
+    post:
+      tags: [Library]
+      summary: Enroll current user into a playlist
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LibraryEnrollRequest' }
+      responses:
+        201:
+          description: Playlist enrolled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Playlist enrolled successfully.' }
+                  data:
+                    type: object
+                    properties:
+                      enrollment: { $ref: '#/components/schemas/LibraryEnrollment' }
+                      playlist: { $ref: '#/components/schemas/LibraryEnrolledPlaylist' }
+        400:
+          description: Invalid request payload or invalid object id
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        404:
+          description: Playlist not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        409:
+          description: User already enrolled in this playlist
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        500:
+          description: Unexpected internal error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /library/my-playlists:
     get:
       tags: [Library]
-      summary: Get list of ongoing videos in the user's library
+      summary: Get all enrolled playlists with progress summary for current user
       security: [{ bearerAuth: [] }]
       responses:
         200:
-          description: Ongoing videos returned successfully
+          description: Library playlists fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Library playlists fetched successfully.' }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/LibraryPlaylistProgressItem' }
+        400:
+          description: Invalid user id context
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        500:
+          description: Unexpected internal error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /library/progress:
     patch:
@@ -740,18 +893,76 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [videoId, watchedSeconds, completionPercentage]
-              properties:
-                videoId: { type: string }
-                watchedSeconds: { type: integer }
-                completionPercentage: { type: number, minimum: 0, maximum: 100 }
+            schema: { $ref: '#/components/schemas/LibraryProgressUpdateRequest' }
       responses:
         200:
-          description: Progress updated
+          description: Video progress updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Video progress updated successfully.' }
+                  data:
+                    type: object
+                    properties:
+                      progress: { $ref: '#/components/schemas/LibraryProgress' }
+                      video:
+                        type: object
+                        properties:
+                          id: { type: string, example: '67ca08f798a1e1726a932a13' }
+                          title: { type: string, example: 'Lesson 07: Dependency Injection' }
+                          thumbnail:
+                            type: string
+                            example: 'https://i.ytimg.com/vi/abc/mqdefault.jpg'
+                      completion:
+                        type: object
+                        properties:
+                          total_videos: { type: integer, example: 20 }
+                          completed_videos: { type: integer, example: 10 }
+                          progress_percentage: { type: number, format: float, example: 50 }
         400:
-          description: Invalid progress data
+          description: Invalid payload, invalid object ids, archived enrollment, or playlist/video mismatch
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        404:
+          description: Playlist, video, or enrollment not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        500:
+          description: Unexpected internal error or progress persistence failure
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /library/continue-watching:
+    get:
+      tags: [Library]
+      summary: Get the most recently updated in-progress video for resume learning
+      security: [{ bearerAuth: [] }]
+      responses:
+        200:
+          description: Continue watching item fetched successfully (nullable when no progress exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Continue watching item fetched successfully.' }
+                  data: { $ref: '#/components/schemas/LibraryContinueWatchingItem' }
+        400:
+          description: Invalid user id context
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        404:
+          description: Latest progress points to a missing video
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        500:
+          description: Unexpected internal error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   # ==========================================
   # 6. NOTE MODULE

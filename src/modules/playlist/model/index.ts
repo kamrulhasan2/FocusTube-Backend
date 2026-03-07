@@ -129,7 +129,6 @@ const playlistSchema = new Schema<IPlaylist>(
 );
 
 playlistSchema.index({ youtubePlaylistId: 1, sourceType: 1 });
-playlistSchema.index({ 'videos.youtubeVideoId': 1 });
 playlistSchema.index({ savedBy: 1, updatedAt: -1 });
 
 export const Playlist = model<IPlaylist>('Playlist', playlistSchema);

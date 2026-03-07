@@ -316,7 +316,7 @@ const updateVideoProgress = async (payload: IUpdateVideoProgressPayload, userId:
     },
     {
       upsert: true,
-      new: true,
+      returnDocument: 'after',
       setDefaultsOnInsert: true,
     },
   ).lean();

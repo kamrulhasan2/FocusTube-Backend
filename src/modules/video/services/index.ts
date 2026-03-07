@@ -6,6 +6,8 @@ import OpenAI from 'openai';
 import { YoutubeTranscript, YoutubeTranscriptError } from 'youtube-transcript';
 import { configEnv } from '../../../config';
 import AppError from '../../../shared/errors/AppError';
+import { Library } from '../../library/model';
+import { LibraryEnrollmentStatus } from '../../library/interface/library.interface';
 import {
   IAIAnswerResponse,
   IChatRequest,
@@ -666,8 +668,25 @@ const getVideoTranscript = async (
 
 const generateVideoSummary = async (
   id: string,
+  userId: string,
 ): Promise<{ summary: string; cacheHit: boolean }> => {
   const video = await getRequiredVideo(id);
+  if (!video.playlistId) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'User must enroll before accessing AI features.');
+  }
+
+  const canAccessAi = await Library.exists({
+    user_id: userId,
+    playlist_id: video.playlistId,
+    status: {
+      $in: [LibraryEnrollmentStatus.ENROLLED, LibraryEnrollmentStatus.COMPLETED],
+    },
+  });
+
+  if (!canAccessAi) {
+    throw new AppError(StatusCodes.FORBIDDEN, 'User must enroll before accessing AI features.');
+  }
+
   const { transcript } = await ensureTranscript(video);
 
   if (video.aiSummary && video.aiSummary.trim().length > 0) {

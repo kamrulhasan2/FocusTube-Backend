@@ -72,6 +72,58 @@ const enrollPlaylist = async (payload: IEnrollPlaylistPayload, userId: string) =
     enrolled_at: new Date(),
   });
 
+  const playlistVideos = playlist.videos || [];
+  const playlistVideoIds = playlistVideos.map(item => item.youtubeVideoId);
+
+  const existingVideos = await Video.find({
+    playlistId: playlistObjectId,
+    youtubeVideoId: { $in: playlistVideoIds },
+  })
+    .select('_id youtubeVideoId')
+    .lean();
+
+  const existingVideoMap = new Map(existingVideos.map(item => [item.youtubeVideoId, item]));
+  const missingVideosPayload = playlistVideos
+    .filter(item => !existingVideoMap.has(item.youtubeVideoId))
+    .map(item => ({
+      playlistId: playlistObjectId,
+      youtubeVideoId: item.youtubeVideoId,
+      title: item.title,
+      description: item.description || '',
+      duration: item.duration || 'PT0S',
+      thumbnails: {
+        default: item.thumbnails?.default || '',
+        medium: item.thumbnails?.medium || '',
+        high: item.thumbnails?.high || '',
+        standard: item.thumbnails?.standard || '',
+        maxres: item.thumbnails?.maxres || '',
+      },
+    }));
+
+  if (missingVideosPayload.length > 0) {
+    await Video.insertMany(missingVideosPayload);
+  }
+
+  const allPlaylistVideos = await Video.find({
+    playlistId: playlistObjectId,
+    youtubeVideoId: { $in: playlistVideoIds },
+  })
+    .select('_id')
+    .lean();
+
+  if (allPlaylistVideos.length > 0) {
+    await VideoProgress.insertMany(
+      allPlaylistVideos.map(item => ({
+        user_id: userObjectId,
+        playlist_id: playlistObjectId,
+        video_id: item._id,
+        last_watched_second: 0,
+        is_completed: false,
+      })),
+      { ordered: false },
+    );
+  }
+
   return {
     enrollment,
     playlist,

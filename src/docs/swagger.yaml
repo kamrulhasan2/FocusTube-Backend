@@ -194,11 +194,57 @@ components:
     Note:
       type: object
       properties:
-        id: { type: string }
-        videoId: { type: string }
-        content: { type: string }
-        timestampSeconds: { type: integer }
+        _id: { type: string, example: '67ca08f798a1e1726a932a41' }
+        user_id: { type: string, example: '67ca08f798a1e1726a932a10' }
+        video_id: { type: string, example: 'dQw4w9WgXcQ' }
+        playlist_id: { type: string, example: '67ca08f798a1e1726a932a12' }
+        title: { type: string, example: 'Important Concept' }
+        content: { type: string, example: '## Key Idea\nThis explains the architecture...' }
+        timestamp_in_seconds: { type: number, example: 125 }
+        last_updated: { type: string, format: date-time }
         createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    NoteCreateRequest:
+      type: object
+      required: [video_id, playlist_id, title, content, timestamp_in_seconds]
+      properties:
+        video_id:
+          type: string
+          pattern: '^[a-zA-Z0-9_-]{6,}$'
+          example: 'dQw4w9WgXcQ'
+        playlist_id:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+          example: '67ca08f798a1e1726a932a12'
+        title:
+          type: string
+          minLength: 1
+          example: 'Important Concept'
+        content:
+          type: string
+          minLength: 1
+          example: '## Key Idea\nThis explains the architecture...'
+        timestamp_in_seconds:
+          type: number
+          minimum: 0
+          example: 125
+
+    NoteUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          example: 'Updated Title'
+        content:
+          type: string
+          minLength: 1
+          example: 'Updated markdown note content.'
+        timestamp_in_seconds:
+          type: number
+          minimum: 0
+          example: 140
 
     LibraryEnrollmentStatus:
       type: string
@@ -976,18 +1022,30 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [videoId, content, timestampSeconds]
-              properties:
-                videoId: { type: string }
-                content: { type: string }
-                timestampSeconds: { type: integer }
+            schema: { $ref: '#/components/schemas/NoteCreateRequest' }
       responses:
         201:
           description: Note created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Note created successfully.' }
+                  data: { $ref: '#/components/schemas/Note' }
         400:
-          description: Validation Error
+          description: Validation error or invalid object id
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        403:
+          description: User is not enrolled in the playlist
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        404:
+          description: Playlist not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /notes/video/{videoId}:
     get:
@@ -998,15 +1056,28 @@ paths:
         - name: videoId
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9_-]{6,}$'
       responses:
         200:
           description: List of notes retrieved
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/Note' }
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Notes fetched successfully.' }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Note' }
+        400:
+          description: Validation error
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /notes/{id}:
     patch:
@@ -1017,23 +1088,37 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            pattern: '^[a-f\d]{24}$'
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [content]
-              properties:
-                content: { type: string }
+            schema: { $ref: '#/components/schemas/NoteUpdateRequest' }
       responses:
         200:
-          description: Note updated
+          description: Note updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Note updated successfully.' }
+                  data: { $ref: '#/components/schemas/Note' }
+        400:
+          description: Validation error or invalid object id
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         403:
           description: Forbidden - User does not own this note
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         404:
           description: Note not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
     delete:
       tags: [Notes]
@@ -1043,14 +1128,34 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: string }
+          schema:
+            type: string
+            pattern: '^[a-f\d]{24}$'
       responses:
         200:
           description: Note deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Note deleted successfully.' }
+                  data:
+                    type: object
+                    example: {}
+        400:
+          description: Validation error or invalid object id
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         403:
           description: Forbidden - User does not own this note
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         404:
           description: Note not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   # ==========================================
   # 7. BILLING & SUBSCRIPTION MODULE

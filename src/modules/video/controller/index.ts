@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-toolkit';
 import AppError from '../../../shared/errors/AppError';
 import { catchAsync, sendResponse } from '../../../shared/utils';
@@ -55,7 +56,15 @@ const generateVideoSummary = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(StatusCodes.BAD_REQUEST, 'Video id is required.');
   }
 
-  const result = await VideoServices.generateVideoSummary(videoId);
+  const authenticatedRequest = req as Request & {
+    user?: JwtPayload & { userId?: string; id?: string };
+  };
+  const userId = authenticatedRequest.user?.id || authenticatedRequest.user?.userId;
+  if (!userId) {
+    throw new AppError(StatusCodes.UNAUTHORIZED, 'Unauthorized request.');
+  }
+
+  const result = await VideoServices.generateVideoSummary(videoId, String(userId));
 
   sendResponse(res, {
     statusCode: StatusCodes.OK,

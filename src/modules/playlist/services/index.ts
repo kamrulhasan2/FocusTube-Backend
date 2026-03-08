@@ -43,7 +43,10 @@ const findPlaylistByYoutubeId = async (youtubePlaylistId: string): Promise<IPlay
   return Playlist.findOne({ youtubePlaylistId }).lean();
 };
 
-const findPlaylistByIdForUser = async (playlistId: string, userId: string): Promise<IPlaylist | null> => {
+const findPlaylistByIdForUser = async (
+  playlistId: string,
+  userId: string,
+): Promise<IPlaylist | null> => {
   return Playlist.findOne({ _id: playlistId, savedBy: userId }).lean();
 };
 
@@ -67,7 +70,7 @@ const upsertPlaylistCache = async (
     },
     {
       upsert: true,
-      new: true,
+      returnDocument: 'after',
       setDefaultsOnInsert: true,
     },
   ).lean();

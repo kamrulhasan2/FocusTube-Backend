@@ -10,6 +10,8 @@ process.env.JWT_REFRESH_EXPIRES_IN = '7d';
 process.env.BCRYPT_SALT_ROUNDS = '4';
 process.env.YOUTUBE_API_KEY = 'test_youtube_api_key';
 process.env.YOUTUBE_API_BASE = 'https://www.googleapis.com/youtube/v3';
+process.env.AI_PROVIDER = 'OPENAI';
+process.env.OPENAI_API_KEY = 'test_openai_api_key';
 
 vi.mock('../config/swagger.config', () => ({
   swaggerDocSetup: vi.fn(),

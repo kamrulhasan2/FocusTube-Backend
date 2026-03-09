@@ -27,6 +27,9 @@ interface ConfigEnv {
   stripe_webhook_secret: string;
   stripe_success_url: string;
   stripe_cancel_url: string;
+  rate_limit_window_ms: number;
+  rate_limit_max_requests: number;
+  auth_rate_limit_max: number;
 }
 
 export const configEnv: ConfigEnv = {
@@ -56,4 +59,7 @@ export const configEnv: ConfigEnv = {
   stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET || '',
   stripe_success_url: process.env.STRIPE_SUCCESS_URL || '',
   stripe_cancel_url: process.env.STRIPE_CANCEL_URL || '',
+  rate_limit_window_ms: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  rate_limit_max_requests: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  auth_rate_limit_max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 10,
 };

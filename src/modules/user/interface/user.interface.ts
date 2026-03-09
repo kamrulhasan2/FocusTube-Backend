@@ -20,6 +20,8 @@ export interface IUser {
   plan: UserPlan;
   isDeleted: boolean;
   refreshTokenHash?: string | null;
+  stripeCustomerId?: string | null;
+  isPro: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

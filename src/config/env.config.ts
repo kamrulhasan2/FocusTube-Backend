@@ -23,6 +23,10 @@ interface ConfigEnv {
   b2_access_key: string;
   b2_secret_key: string;
   b2_bucket_name: string;
+  stripe_secret_key: string;
+  stripe_webhook_secret: string;
+  stripe_success_url: string;
+  stripe_cancel_url: string;
 }
 
 export const configEnv: ConfigEnv = {
@@ -48,4 +52,8 @@ export const configEnv: ConfigEnv = {
   b2_access_key: process.env.B2_ACCESS_KEY || '',
   b2_secret_key: process.env.B2_SECRET_KEY || '',
   b2_bucket_name: process.env.B2_BUCKET_NAME || '',
+  stripe_secret_key: process.env.STRIPE_SECRET_KEY || '',
+  stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  stripe_success_url: process.env.STRIPE_SUCCESS_URL || '',
+  stripe_cancel_url: process.env.STRIPE_CANCEL_URL || '',
 };

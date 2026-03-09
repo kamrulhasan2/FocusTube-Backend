@@ -50,6 +50,16 @@ const userSchema = new Schema<IUser>(
       default: null,
       select: false,
     },
+    stripeCustomerId: {
+      type: String,
+      default: null,
+      index: true,
+    },
+    isPro: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   {
     timestamps: true,

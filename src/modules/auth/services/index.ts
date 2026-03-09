@@ -19,6 +19,7 @@ const sanitizeUser = (user: {
   avatar?: string;
   role: string;
   plan: string;
+  isPro: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }) => ({
@@ -28,15 +29,12 @@ const sanitizeUser = (user: {
   avatar: user.avatar,
   role: user.role,
   plan: user.plan,
+  isPro: user.isPro,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
 
-const signJwt = (
-  payload: IJwtTokenPayload,
-  secret: string,
-  expiresIn: string,
-): string =>
+const signJwt = (payload: IJwtTokenPayload, secret: string, expiresIn: string): string =>
   jwt.sign(payload, secret, {
     expiresIn,
   } as SignOptions);
@@ -113,10 +111,8 @@ const login = async (payload: ILoginPayload): Promise<IAuthResponse> => {
 const refreshToken = async (payload: IRefreshTokenPayload) => {
   let decoded: JwtPayload & IJwtTokenPayload;
   try {
-    decoded = jwt.verify(
-      payload.refreshToken,
-      configEnv.jwt_refresh_secret,
-    ) as JwtPayload & IJwtTokenPayload;
+    decoded = jwt.verify(payload.refreshToken, configEnv.jwt_refresh_secret) as JwtPayload &
+      IJwtTokenPayload;
   } catch (_error) {
     throw new AppError(401, 'Invalid or expired refresh token.');
   }

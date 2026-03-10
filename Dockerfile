@@ -4,9 +4,14 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+ENV SIMPLE_GIT_HOOKS=0
+
+RUN npm ci --production=false
 
 COPY . .
+
+RUN npm run build \
+  && npm prune --production
 
 EXPOSE 4000
 

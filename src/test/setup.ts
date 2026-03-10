@@ -12,6 +12,9 @@ process.env.YOUTUBE_API_KEY = 'test_youtube_api_key';
 process.env.YOUTUBE_API_BASE = 'https://www.googleapis.com/youtube/v3';
 process.env.AI_PROVIDER = 'OPENAI';
 process.env.OPENAI_API_KEY = 'test_openai_api_key';
+process.env.RATE_LIMIT_WINDOW_MS = '900000';
+process.env.RATE_LIMIT_MAX_REQUESTS = '10000';
+process.env.AUTH_RATE_LIMIT_MAX = '10000';
 
 vi.mock('../config/swagger.config', () => ({
   swaggerDocSetup: vi.fn(),

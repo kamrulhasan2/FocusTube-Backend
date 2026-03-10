@@ -48,6 +48,7 @@ components:
         avatar: { type: string }
         role: { type: string, enum: [USER, ADMIN] }
         plan: { type: string, enum: [FREE, PRO] }
+        isPro: { type: boolean, example: false }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
 
@@ -338,6 +339,44 @@ components:
         last_watched_second: { type: number, example: 510 }
         video_title: { type: string, example: 'Lesson 07: Dependency Injection' }
         thumbnail: { type: string, example: 'https://i.ytimg.com/vi/abc/mqdefault.jpg' }
+
+    BillingPlan:
+      type: object
+      properties:
+        _id: { type: string, example: '67ccf6b58b0dfe7f7730a001' }
+        name: { type: string, example: 'FocusTube Pro' }
+        price: { type: number, example: 49 }
+        interval: { type: string, enum: [month, year], example: year }
+        features:
+          type: array
+          items: { type: string }
+          example: ['Unlimited AI summaries', 'Advanced analytics']
+
+    BillingCheckoutRequest:
+      type: object
+      required: [plan_id]
+      properties:
+        plan_id:
+          type: string
+          pattern: '^[a-f\d]{24}$'
+          example: '67ccf6b58b0dfe7f7730a001'
+
+    BillingCheckoutData:
+      type: object
+      properties:
+        checkout_url:
+          type: string
+          format: uri
+          example: 'https://checkout.stripe.com/c/pay/cs_test_123'
+
+    BillingHistoryItem:
+      type: object
+      properties:
+        _id: { type: string, example: '67ccfaed8b0dfe7f7730a111' }
+        amount: { type: number, example: 49 }
+        currency: { type: string, example: USD }
+        payment_status: { type: string, enum: [succeeded, failed], example: succeeded }
+        created_at: { type: string, format: date-time, example: '2026-03-08T00:00:00.000Z' }
 
 paths:
   # ==========================================
@@ -1163,57 +1202,107 @@ paths:
   /billing/plans:
     get:
       tags: [Billing]
-      summary: View available subscription plans (Monthly, Yearly)
+      summary: Get all active billing plans
       responses:
         200:
-          description: Plans retrieved successfully
+          description: Billing plans fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Billing plans fetched successfully.' }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/BillingPlan' }
 
   /billing/checkout:
     post:
       tags: [Billing]
-      summary: Initialize a checkout session (Stripe/SSLCommerz)
+      summary: Create Stripe checkout session for subscription purchase
       security: [{ bearerAuth: [] }]
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              type: object
-              required: [planId]
-              properties:
-                planId: { type: string }
+            schema: { $ref: '#/components/schemas/BillingCheckoutRequest' }
       responses:
         200:
-          description: Checkout URL generated
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Checkout session created.' }
+                  data: { $ref: '#/components/schemas/BillingCheckoutData' }
         400:
-          description: Invalid Plan ID
+          description: Invalid request or user already has an active subscription
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        401:
+          description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        404:
+          description: Active plan not found
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        502:
+          description: Failed to create Stripe checkout session
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
         503:
-          description: Payment Gateway Unavailable
+          description: Stripe configuration missing
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /billing/webhook:
     post:
       tags: [Billing]
-      summary: Receive status updates from the payment gateway
+      summary: Receive Stripe billing events
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              description: Payment Gateway Payload
+              description: Stripe webhook event payload (raw body required for signature verification)
       responses:
         200:
-          description: Webhook received and processed
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Webhook processed successfully.' }
+                  data:
+                    type: object
+                    example: {}
         400:
-          description: Invalid Webhook Signature
+          description: Invalid webhook signature
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        503:
+          description: Stripe webhook secret not configured
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
   /billing/history:
     get:
       tags: [Billing]
-      summary: View user's past transaction history
+      summary: Get current user's billing transaction history
       security: [{ bearerAuth: [] }]
       responses:
         200:
-          description: Transaction history retrieved
+          description: Billing history fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Billing history fetched successfully.' }
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/BillingHistoryItem' }
         401:
           description: Unauthorized
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }

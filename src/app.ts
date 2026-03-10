@@ -3,10 +3,22 @@ import { StatusCodes } from 'http-status-toolkit';
 import { swaggerDocSetup } from './config';
 import AppError from './shared/errors/AppError';
 import { applyMiddleware, globalErrorHandler, notFoundHandler } from './shared/middlewares';
+import {
+  generalApiRateLimit,
+  helmetMiddleware,
+  sensitiveEndpointRateLimit,
+} from './shared/middlewares/security';
 import { logger } from './shared/utils';
 import routes from './routes';
 
 const app = express();
+app.disable('x-powered-by');
+
+// Security headers
+app.use(helmetMiddleware);
+
+// Stripe webhook route requires raw body for signature verification
+app.use('/api/v1/billing/webhook', express.raw({ type: 'application/json' }));
 
 //body parser
 app.use(express.json());
@@ -14,6 +26,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // Apply custom middleware
 applyMiddleware(app);
+
+// Rate limiters
+app.use(generalApiRateLimit);
+app.use('/api/v1/auth/login', sensitiveEndpointRateLimit);
+app.use('/api/v1/billing/checkout', sensitiveEndpointRateLimit);
 
 // home route
 app.get('/', (_req: Request, res: Response) => {

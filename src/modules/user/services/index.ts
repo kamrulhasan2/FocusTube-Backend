@@ -13,6 +13,7 @@ const sanitizeUser = (user: {
   avatar?: string;
   role: string;
   plan: string;
+  isPro: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }) => ({
@@ -22,6 +23,7 @@ const sanitizeUser = (user: {
   avatar: user.avatar,
   role: user.role,
   plan: user.plan,
+  isPro: user.isPro,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });

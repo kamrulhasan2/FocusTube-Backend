@@ -23,6 +23,13 @@ interface ConfigEnv {
   b2_access_key: string;
   b2_secret_key: string;
   b2_bucket_name: string;
+  stripe_secret_key: string;
+  stripe_webhook_secret: string;
+  stripe_success_url: string;
+  stripe_cancel_url: string;
+  rate_limit_window_ms: number;
+  rate_limit_max_requests: number;
+  auth_rate_limit_max: number;
 }
 
 export const configEnv: ConfigEnv = {
@@ -48,4 +55,11 @@ export const configEnv: ConfigEnv = {
   b2_access_key: process.env.B2_ACCESS_KEY || '',
   b2_secret_key: process.env.B2_SECRET_KEY || '',
   b2_bucket_name: process.env.B2_BUCKET_NAME || '',
+  stripe_secret_key: process.env.STRIPE_SECRET_KEY || '',
+  stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  stripe_success_url: process.env.STRIPE_SUCCESS_URL || '',
+  stripe_cancel_url: process.env.STRIPE_CANCEL_URL || '',
+  rate_limit_window_ms: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
+  rate_limit_max_requests: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  auth_rate_limit_max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 10,
 };

@@ -13,6 +13,16 @@ export const swaggerDocSetup = (app: any) => {
     const apiSpec = fs.existsSync(distSpec) ? distSpec : srcSpec;
     const swaggerDocument = YAML.parse(fs.readFileSync(apiSpec, 'utf8'));
 
+    if (configEnv.swagger_base_url) {
+      const baseUrl = configEnv.swagger_base_url.replace(/\/$/, '');
+      swaggerDocument.servers = [
+        {
+          url: `${baseUrl}/api/v1`,
+          description: 'Production Server',
+        },
+      ];
+    }
+
     // Serve Swagger UI at the /api-docs endpoint
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

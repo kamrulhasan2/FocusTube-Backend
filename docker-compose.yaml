@@ -1,48 +1,42 @@
 services:
-  # MongoDB
-  mongodb: 
-    image: mongo:latest
-    container_name: mongodb
-    restart: always
-    environment: 
-      MONGO_INITDB_ROOT_USERNAME: testuser
-      MONGO_INITDB_ROOT_PASSWORD: testpassword
-      AUTH: admin
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: focustube-backend
+    restart: unless-stopped
     ports:
-      - '27017:27017'
-    volumes:
-      - 'my_mongodb_data:/data/db'
-  
-  # Mongo Express
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
-    restart: always
+      - '${PORT:-4000}:4000'
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: testuser
-      ME_CONFIG_MONGODB_ADMINPASSWORD: testpassword
-      ME_CONFIG_MONGODB_URL: mongodb://testuser:testpassword@mongodb:27017/?authSource=admin
-      ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: password
-    ports:
-      - '8081:8081'
-    depends_on:
-      - mongodb
-
-  # Node App
-  node-app:
-    build: .
-    container_name: focus-tube-backend
-    restart: always
-    ports:
-      - '4000:4000'
-    environment:
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: 4000
-      MONGO_URL: mongodb://testuser:testpassword@mongodb:27017/focustube?authSource=admin
-    depends_on:
-      - mongodb
+      MONGO_URL: ${MONGO_URL}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-120m}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      BCRYPT_SALT_ROUNDS: ${BCRYPT_SALT_ROUNDS:-12}
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+      YOUTUBE_API_BASE: ${YOUTUBE_API_BASE:-https://www.googleapis.com/youtube/v3}
+      B2_ENDPOINT: ${B2_ENDPOINT}
+      B2_ACCESS_KEY: ${B2_ACCESS_KEY}
+      B2_SECRET_KEY: ${B2_SECRET_KEY}
+      B2_BUCKET_NAME: ${B2_BUCKET_NAME}
+      GOOGLE_GEMINI_API_KEY: ${GOOGLE_GEMINI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      AI_PROVIDER: ${AI_PROVIDER:-GEMINI}
+      RATE_LIMIT_WINDOW_MS: ${RATE_LIMIT_WINDOW_MS:-900000}
+      RATE_LIMIT_MAX_REQUESTS: ${RATE_LIMIT_MAX_REQUESTS:-100}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-10}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      STRIPE_SUCCESS_URL: ${STRIPE_SUCCESS_URL}
+      STRIPE_CANCEL_URL: ${STRIPE_CANCEL_URL}
+    networks:
+      - focustube-network
+    volumes:
+      - ./logs:/app/logs
 
-volumes:
-  my_mongodb_data:
-    driver: local
-
+networks:
+  focustube-network:
+    driver: bridge

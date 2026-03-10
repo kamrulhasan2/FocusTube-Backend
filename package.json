@@ -14,7 +14,8 @@
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "prettier --write \"./src/**/*.+(js|ts|json)\"",
-    "postinstall": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "render-build": "npm ci --production=false && npm run build"
   },
   "keywords": [],
   "license": "ISC",

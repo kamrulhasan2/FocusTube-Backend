@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: focustube-backend
+    runtime: node
+    buildCommand: npm ci --production=false && npm run build
+    startCommand: npm run start
+    autoDeploy: true

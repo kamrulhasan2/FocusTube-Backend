@@ -31,6 +31,7 @@ interface ConfigEnv {
   rate_limit_window_ms: number;
   rate_limit_max_requests: number;
   auth_rate_limit_max: number;
+  focustube_frontend_url: string;
 }
 
 export const configEnv: ConfigEnv = {
@@ -64,4 +65,5 @@ export const configEnv: ConfigEnv = {
   rate_limit_window_ms: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
   rate_limit_max_requests: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   auth_rate_limit_max: Number(process.env.AUTH_RATE_LIMIT_MAX) || 10,
+  focustube_frontend_url: process.env.FOCUSTUBE_FRONTEND_URL || 'http://localhost:3000',
 };

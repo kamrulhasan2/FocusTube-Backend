@@ -291,8 +291,8 @@ components:
       properties:
         video_id:
           type: string
-          pattern: '^[a-f\d]{24}$'
-          example: '67ca08f798a1e1726a932a13'
+          pattern: '(^[a-f\\d]{24}$)|(^[a-zA-Z0-9_-]{6,}$)'
+          example: 'dQw4w9WgXcQ'
         playlist_id:
           type: string
           pattern: '^[a-f\d]{24}$'

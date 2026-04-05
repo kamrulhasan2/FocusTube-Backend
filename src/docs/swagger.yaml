@@ -1285,6 +1285,37 @@ paths:
           description: Stripe webhook secret not configured
           content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
 
+  /payments/webhook:
+    post:
+      tags: [Billing]
+      summary: Receive Stripe billing events (legacy payments route)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Stripe webhook event payload (raw body required for signature verification)
+      responses:
+        200:
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Webhook processed successfully.' }
+                  data:
+                    type: object
+                    example: {}
+        400:
+          description: Invalid webhook signature
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        503:
+          description: Stripe webhook secret not configured
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
   /billing/history:
     get:
       tags: [Billing]

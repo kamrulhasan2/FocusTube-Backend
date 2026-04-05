@@ -17,8 +17,9 @@ app.disable('x-powered-by');
 // Security headers
 app.use(helmetMiddleware);
 
-// Stripe webhook route requires raw body for signature verification
+// Stripe webhook routes require raw body for signature verification
 app.use('/api/v1/billing/webhook', express.raw({ type: 'application/json' }));
+app.use('/api/v1/payments/webhook', express.raw({ type: 'application/json' }));
 
 //body parser
 app.use(express.json());

@@ -27,6 +27,11 @@ interface ConfigEnv {
   stripe_webhook_secret: string;
   stripe_success_url: string;
   stripe_cancel_url: string;
+  billing_pro_stripe_price_id: string;
+  billing_pro_plan_name: string;
+  billing_pro_plan_price: number;
+  billing_pro_plan_interval: string;
+  billing_pro_plan_features: string;
   swagger_base_url: string;
   rate_limit_window_ms: number;
   rate_limit_max_requests: number;
@@ -61,6 +66,11 @@ export const configEnv: ConfigEnv = {
   stripe_webhook_secret: process.env.STRIPE_WEBHOOK_SECRET || '',
   stripe_success_url: process.env.STRIPE_SUCCESS_URL || '',
   stripe_cancel_url: process.env.STRIPE_CANCEL_URL || '',
+  billing_pro_stripe_price_id: process.env.BILLING_PRO_STRIPE_PRICE_ID || '',
+  billing_pro_plan_name: process.env.BILLING_PRO_PLAN_NAME || 'FocusTube Pro',
+  billing_pro_plan_price: Number(process.env.BILLING_PRO_PLAN_PRICE) || 49,
+  billing_pro_plan_interval: process.env.BILLING_PRO_PLAN_INTERVAL || 'year',
+  billing_pro_plan_features: process.env.BILLING_PRO_PLAN_FEATURES || '',
   swagger_base_url: process.env.SWAGGER_BASE_URL || '',
   rate_limit_window_ms: Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
   rate_limit_max_requests: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,

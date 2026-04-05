@@ -19,6 +19,7 @@
     "rootDir": "./src",
     "sourceMap": true,
     "inlineSources": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./src",
     "types": ["node", "vitest/globals"],
     "paths": {

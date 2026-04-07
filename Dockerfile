@@ -6,7 +6,7 @@ COPY package*.json ./
 
 ENV SIMPLE_GIT_HOOKS=0
 
-RUN npm ci --production=false
+RUN npm ci --legacy-peer-deps --production=false
 
 COPY . .
 

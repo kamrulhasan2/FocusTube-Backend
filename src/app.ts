@@ -12,6 +12,7 @@ import { logger } from './shared/utils';
 import routes from './routes';
 
 const app = express();
+app.set('trust proxy', 1);
 app.disable('x-powered-by');
 
 // Security headers

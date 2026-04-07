@@ -16,7 +16,7 @@
     "prettier:fix": "prettier --write \"./src/**/*.+(js|ts|json)\"",
     "seed:billing": "tsx src/db/seedBillingPlans.runner.ts",
     "prepare": "simple-git-hooks",
-    "render-build": "npm ci --production=false && npm run build"
+    "render-build": "npm ci --legacy-peer-deps --production=false && npm run build"
   },
   "keywords": [],
   "license": "ISC",

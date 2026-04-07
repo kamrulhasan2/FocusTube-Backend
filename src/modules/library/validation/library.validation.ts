@@ -16,7 +16,10 @@ const enrollPlaylist = z.object({
 const updateVideoProgress = z.object({
   body: z
     .object({
-      video_id: objectIdSchema,
+      video_id: z
+        .string()
+        .trim()
+        .regex(/(^[a-f\d]{24}$)|(^[a-zA-Z0-9_-]{6,}$)/, 'Invalid video id.'),
       playlist_id: objectIdSchema,
       watched_second: z
         .number({

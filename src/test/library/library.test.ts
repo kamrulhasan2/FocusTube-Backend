@@ -199,6 +199,40 @@ describe('Library Module', () => {
       expect(currentPlaylist.progress_percentage).toBe(50);
     });
 
+    it('should accept youtubeVideoId as video_id and persist progress', async () => {
+      const { accessToken, user } = await registerAndLogin();
+      const playlist = await seedPlaylist();
+
+      await request(app)
+        .post('/api/v1/library/enroll')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({ playlist_id: String(playlist._id) });
+
+      const dbUser = await User.findOne({ email: user.email }).select('_id').lean();
+      const videos = await Video.find({ playlistId: playlist._id }).sort({ createdAt: 1 }).lean();
+
+      const response = await request(app)
+        .patch('/api/v1/library/progress')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send({
+          video_id: String(videos[0].youtubeVideoId),
+          playlist_id: String(playlist._id),
+          watched_second: 20,
+        });
+
+      expect(response.status).toBe(StatusCodes.OK);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.progress.last_watched_second).toBe(20);
+
+      const progressInDb = await VideoProgress.findOne({
+        user_id: dbUser?._id,
+        playlist_id: playlist._id,
+        video_id: videos[0]._id,
+      }).lean();
+
+      expect(progressInDb?.last_watched_second).toBe(20);
+    });
+
     it('should fail validation for negative watched_second', async () => {
       const { accessToken } = await registerAndLogin();
       const playlist = await seedPlaylist();

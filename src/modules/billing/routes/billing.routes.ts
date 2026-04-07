@@ -11,9 +11,10 @@ router.post(
   BillingController.handleStripeWebhook,
 );
 
+router.get('/plans', BillingController.getAvailablePlans);
+
 router.use(authGuard());
 
-router.get('/plans', BillingController.getAvailablePlans);
 router.post(
   '/checkout',
   validateRequest(BillingValidation.createCheckoutSession),

@@ -240,13 +240,9 @@ const getMyPlaylists = async (userId: string): Promise<IPlaylistProgressSummary[
 const updateVideoProgress = async (payload: IUpdateVideoProgressPayload, userId: string) => {
   const userObjectId = toObjectId(userId, 'User id');
   const playlistObjectId = toObjectId(payload.playlist_id, 'Playlist id');
-  const videoObjectId = toObjectId(payload.video_id, 'Video id');
 
-  const [playlist, video, enrollment] = await Promise.all([
+  const [playlist, enrollment] = await Promise.all([
     Playlist.findById(playlistObjectId).select('_id videos').lean(),
-    Video.findById(videoObjectId)
-      .select('_id playlistId youtubeVideoId title thumbnails duration')
-      .lean(),
     Library.findOne({
       user_id: userObjectId,
       playlist_id: playlistObjectId,
@@ -255,10 +251,6 @@ const updateVideoProgress = async (payload: IUpdateVideoProgressPayload, userId:
 
   if (!playlist) {
     throw new AppError(StatusCodes.NOT_FOUND, 'PlaylistNotFound: Playlist was not found.');
-  }
-
-  if (!video) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'VideoNotFound: Video was not found.');
   }
 
   if (!enrollment) {
@@ -275,6 +267,24 @@ const updateVideoProgress = async (payload: IUpdateVideoProgressPayload, userId:
     );
   }
 
+  const videoIdIsObjectId = Types.ObjectId.isValid(payload.video_id);
+  const video =
+    (videoIdIsObjectId
+      ? await Video.findById(payload.video_id)
+          .select('_id playlistId youtubeVideoId title thumbnails duration')
+          .lean()
+      : null) ??
+    (await Video.findOne({
+      playlistId: playlistObjectId,
+      youtubeVideoId: payload.video_id,
+    })
+      .select('_id playlistId youtubeVideoId title thumbnails duration')
+      .lean());
+
+  if (!video) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'VideoNotFound: Video was not found.');
+  }
+
   if (video.playlistId && String(video.playlistId) !== String(playlistObjectId)) {
     throw new AppError(
       StatusCodes.BAD_REQUEST,
@@ -282,6 +292,7 @@ const updateVideoProgress = async (payload: IUpdateVideoProgressPayload, userId:
     );
   }
 
+  const videoObjectId = video._id;
   const existingProgress = await VideoProgress.findOne({
     user_id: userObjectId,
     video_id: videoObjectId,

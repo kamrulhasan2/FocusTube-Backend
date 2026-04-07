@@ -14,6 +14,7 @@
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "prettier:fix": "prettier --write \"./src/**/*.+(js|ts|json)\"",
+    "seed:billing": "tsx src/db/seedBillingPlans.runner.ts",
     "prepare": "simple-git-hooks",
     "render-build": "npm ci --production=false && npm run build"
   },

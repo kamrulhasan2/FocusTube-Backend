@@ -4,7 +4,7 @@ import { configEnv } from '../../../config';
 import { logger } from '../../utils';
 
 const SENSITIVE_ENDPOINTS = ['/api/v1/auth/login', '/api/v1/billing/checkout'];
-const WEBHOOK_ENDPOINT = '/api/v1/billing/webhook';
+const WEBHOOK_ENDPOINTS = ['/api/v1/billing/webhook', '/api/v1/payments/webhook'];
 
 const shouldSkipGeneralRateLimit = (req: Request): boolean => {
   const requestPath = req.originalUrl.split('?')[0];
@@ -13,7 +13,7 @@ const shouldSkipGeneralRateLimit = (req: Request): boolean => {
     return true;
   }
 
-  if (requestPath === WEBHOOK_ENDPOINT) {
+  if (WEBHOOK_ENDPOINTS.includes(requestPath)) {
     return true;
   }
 

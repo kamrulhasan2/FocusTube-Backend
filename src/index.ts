@@ -1,6 +1,7 @@
 import app from './app';
 import { configEnv } from './config';
 import { connectDB } from './db';
+import { seedBillingPlans } from './db/seedBillingPlans';
 import { logger } from './shared/utils';
 
 const port: number = configEnv.port;
@@ -9,6 +10,7 @@ const port: number = configEnv.port;
   try {
     // Connect to the database
     await connectDB();
+    await seedBillingPlans();
 
     // Start the server
     app.listen(port, () => {

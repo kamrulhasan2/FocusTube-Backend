@@ -11,6 +11,7 @@ const router = Router();
 
 router.use('/auth', AuthRoutes);
 router.use('/billing', BillingRoutes);
+router.use('/payments', BillingRoutes);
 router.use('/library', LibraryRoutes);
 router.use('/notes', NoteRoutes);
 router.use('/playlists', PlaylistRoutes);

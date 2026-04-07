@@ -291,8 +291,8 @@ components:
       properties:
         video_id:
           type: string
-          pattern: '^[a-f\d]{24}$'
-          example: '67ca08f798a1e1726a932a13'
+          pattern: '(^[a-f\\d]{24}$)|(^[a-zA-Z0-9_-]{6,}$)'
+          example: 'dQw4w9WgXcQ'
         playlist_id:
           type: string
           pattern: '^[a-f\d]{24}$'
@@ -1258,6 +1258,37 @@ paths:
     post:
       tags: [Billing]
       summary: Receive Stripe billing events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Stripe webhook event payload (raw body required for signature verification)
+      responses:
+        200:
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  message: { type: string, example: 'Webhook processed successfully.' }
+                  data:
+                    type: object
+                    example: {}
+        400:
+          description: Invalid webhook signature
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+        503:
+          description: Stripe webhook secret not configured
+          content: { application/json: { schema: { $ref: '#/components/schemas/ErrorResponse' } } }
+
+  /payments/webhook:
+    post:
+      tags: [Billing]
+      summary: Receive Stripe billing events (legacy payments route)
       requestBody:
         required: true
         content:
